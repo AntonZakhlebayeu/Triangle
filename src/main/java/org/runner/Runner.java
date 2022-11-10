@@ -1,5 +1,6 @@
 package org.runner;
 
+import org.point.Point;
 import org.triangle.Triangle;
 import org.util.enums.TriangleTypes;
 
@@ -17,9 +18,6 @@ public class Runner {
         for(int i=0; i<trianglesNumber; i++) {
             Triangle triangle = new Triangle();
             triangle.createTriangle();
-            triangle.calculatePerimeter();
-            triangle.calculateArea();
-
             triangles.add(triangle);
         }
     }
@@ -127,5 +125,9 @@ public class Runner {
             System.out.println("Max perimeter: " + findMaxPerimeter(scaleneTriangles));
             System.out.println("Min perimeter: " + findMinPerimeter(scaleneTriangles));
         }
+
+        System.out.println(triangles.get(0).toString());
+        triangles.get(0).setA(new Point(0, 0));
+        System.out.println(triangles.get(0).toString());
     }
 }

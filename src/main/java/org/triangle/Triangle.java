@@ -44,6 +44,8 @@ public class Triangle extends Shape implements TriangleMaker {
 
         qualifySidesType();
         qualifyAnglesType();
+        calculatePerimeter();
+        calculateArea();
     }
 
     private Boolean triangleExists() {
@@ -105,14 +107,36 @@ public class Triangle extends Shape implements TriangleMaker {
                         + Math.pow(sides[TriangleSides.AB.ordinal()], 2));
     }
 
+    private void updateCalculations() {
+        qualifySidesType();
+        qualifyAnglesType();
+        calculatePerimeter();
+        calculateArea();
+    }
+
     public Point getA() { return a; }
-    public void setA(Point a) { this.a = a; }
+    public void setA(Point a) {
+        this.a = a;
+        sides[TriangleSides.AB.ordinal()] = calculateLength(this.a, this.b);
+        sides[TriangleSides.AC.ordinal()] = calculateLength(this.a, this.c);
+        updateCalculations();
+    }
 
     public Point getB() { return b; }
-    public void setB(Point b) { this.b = b; }
+    public void setB(Point b) {
+        this.b = b;
+        sides[TriangleSides.AB.ordinal()] = calculateLength(this.a, this.b);
+        sides[TriangleSides.BC.ordinal()] = calculateLength(this.b, this.c);
+        updateCalculations();
+    }
 
     public Point getC() { return c; }
-    public void setC(Point c) { this.c = c; }
+    public void setC(Point c) {
+        this.c = c;
+        sides[TriangleSides.BC.ordinal()] = calculateLength(this.b, this.c);
+        sides[TriangleSides.AC.ordinal()] = calculateLength(this.a, this.c);
+        updateCalculations();
+    }
 
     public TriangleTypes getTriangleType() {
         return triangleType;

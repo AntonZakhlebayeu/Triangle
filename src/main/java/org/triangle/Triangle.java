@@ -20,6 +20,7 @@ public class Triangle extends Shape implements TriangleMaker {
         Scanner readme = new Scanner(System.in);
         double x, y;
 
+        System.out.println("Enter the coordinates of the triangle: ");
         x = readme.nextDouble();
         y = readme.nextDouble();
 
@@ -36,8 +37,19 @@ public class Triangle extends Shape implements TriangleMaker {
         sides[TriangleSides.BC.ordinal()] = calculateLength(this.b, this.c);
         sides[TriangleSides.AC.ordinal()] = calculateLength(this.a, this.c);
 
+        while(!triangleExists()) {
+            System.out.println("Enter a valid triangle");
+            createTriangle();
+        }
+
         qualifySidesType();
         qualifyAnglesType();
+    }
+
+    private Boolean triangleExists() {
+        return sides[TriangleSides.AB.ordinal()]+sides[TriangleSides.BC.ordinal()] > sides[TriangleSides.AC.ordinal()] &&
+          sides[TriangleSides.AB.ordinal()]+sides[TriangleSides.AC.ordinal()]>sides[TriangleSides.BC.ordinal()] &&
+          sides[TriangleSides.BC.ordinal()]+sides[TriangleSides.AC.ordinal()]>sides[TriangleSides.AB.ordinal()];
     }
 
     private double calculateLength(Point a, Point b) {

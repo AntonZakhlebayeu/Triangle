@@ -114,6 +114,10 @@ public class Triangle extends Shape implements TriangleMaker {
     public Point getC() { return c; }
     public void setC(Point c) { this.c = c; }
 
+    public TriangleTypes getTriangleType() {
+        return triangleType;
+    }
+
     @Override
     public void calculateArea() {
         double semiPerimeter = perimeter / 2;

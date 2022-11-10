@@ -1,24 +1,20 @@
 package org.triangle;
 
 import org.point.Point;
+import org.shape.Shape;
+import org.util.enums.AngleTypes;
 import org.util.enums.TriangleSides;
 import org.util.enums.TriangleTypes;
-import org.util.interfaces.AreaCalculator;
 import org.util.interfaces.TriangleMaker;
-import org.util.interfaces.TypeQualifier;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
-public class Triangle implements TriangleMaker, TypeQualifier, AreaCalculator {
-    private Point a;
-    private Point b;
-    private Point c;
-
-    private List<Double> sides = new ArrayList<Double>();
-
+public class Triangle extends Shape implements TriangleMaker {
+    private Point a, b, c;
+    private final Double[] sides = new Double[3];
     private TriangleTypes triangleType;
+    private AngleTypes angleType;
 
     private Point createPoint() {
         Scanner readme = new Scanner(System.in);
@@ -36,30 +32,65 @@ public class Triangle implements TriangleMaker, TypeQualifier, AreaCalculator {
         this.b = createPoint();
         this.c = createPoint();
 
-        qualifyType();
+        sides[TriangleSides.AB.ordinal()] = calculateLength(this.a, this.b);
+        sides[TriangleSides.BC.ordinal()] = calculateLength(this.b, this.c);
+        sides[TriangleSides.AC.ordinal()] = calculateLength(this.a, this.c);
+
+        qualifySidesType();
+        qualifyAnglesType();
     }
 
     private double calculateLength(Point a, Point b) {
         return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
     }
 
-    @Override
-    public void qualifyType() {
-        sides.add(calculateLength(this.a, this.b));
-        sides.add(calculateLength(this.b, this.c));
-        sides.add(calculateLength(this.a, this.c));
-
-        System.out.println(sides.get(TriangleSides.AB.ordinal()));
-        System.out.println(sides.get(TriangleSides.BC.ordinal()));
-        System.out.println(sides.get(TriangleSides.AC.ordinal()));
+    private void qualifySidesType() {
+        if(isEquilateral()) {
+            triangleType = TriangleTypes.EQUILATERAL;
+        } else if(isIsosceles()) {
+            triangleType = TriangleTypes.ISOSCELES;
+        } else {
+            triangleType = TriangleTypes.SCALENE;
+        }
     }
 
-    @Override
-    public String toString() {
-        return "Triangle{" +
-                "Ax: " + a.getX() + " Ay: " + a.getY()+
-                ", Bx: " + b.getX() + " By: " + b.getY() +
-                ", Cx: " + c.getX() + " Cy: " + c.getY() + "}";
+    private void qualifyAnglesType() {
+        if(isRectangular()) {
+            angleType = AngleTypes.RIGHT;
+        } else if(isAcute() || triangleType == TriangleTypes.EQUILATERAL) {
+            angleType = AngleTypes.ACUTE;
+        } else {
+            angleType = AngleTypes.OBTUSE;
+        }
+    }
+
+    private Boolean isIsosceles() {
+        return (Objects.equals(sides[TriangleSides.AB.ordinal()], sides[TriangleSides.BC.ordinal()]) ||
+                Objects.equals(sides[TriangleSides.BC.ordinal()], sides[TriangleSides.AC.ordinal()]) ||
+                Objects.equals(sides[TriangleSides.AB.ordinal()], sides[TriangleSides.AC.ordinal()]));
+    }
+
+
+    private Boolean isEquilateral() {
+        return Objects.equals(sides[TriangleSides.AB.ordinal()], sides[TriangleSides.BC.ordinal()]) &&
+                Objects.equals(sides[TriangleSides.BC.ordinal()], sides[TriangleSides.AC.ordinal()]);
+    }
+
+    private Boolean isRectangular() {
+        return Math.pow(sides[TriangleSides.AB.ordinal()], 2) == Math.pow(sides[TriangleSides.BC.ordinal()], 2)
+                + Math.pow(sides[TriangleSides.AC.ordinal()], 2) || Math.pow(sides[TriangleSides.BC.ordinal()], 2) ==
+                Math.pow(sides[TriangleSides.AC.ordinal()], 2) + Math.pow(sides[TriangleSides.AB.ordinal()], 2) ||
+                Math.pow(sides[TriangleSides.AC.ordinal()], 2) == Math.pow(sides[TriangleSides.BC.ordinal()], 2) +
+                Math.pow(sides[TriangleSides.AB.ordinal()], 2);
+    }
+
+    private Boolean isAcute() {
+        return (Math.pow(sides[TriangleSides.AB.ordinal()], 2) < Math.pow(sides[TriangleSides.BC.ordinal()], 2)
+                + Math.pow(sides[TriangleSides.AC.ordinal()], 2)) &&
+                (Math.pow(sides[TriangleSides.BC.ordinal()], 2) < Math.pow(sides[TriangleSides.AC.ordinal()], 2)
+                        + Math.pow(sides[TriangleSides.AB.ordinal()], 2)) &&
+                (Math.pow(sides[TriangleSides.AC.ordinal()], 2) < Math.pow(sides[TriangleSides.BC.ordinal()], 2)
+                        + Math.pow(sides[TriangleSides.AB.ordinal()], 2));
     }
 
     public Point getA() { return a; }
@@ -70,4 +101,29 @@ public class Triangle implements TriangleMaker, TypeQualifier, AreaCalculator {
 
     public Point getC() { return c; }
     public void setC(Point c) { this.c = c; }
+
+    @Override
+    public void calculateArea() {
+        double semiPerimeter = perimeter / 2;
+        area = Math.sqrt(semiPerimeter * (semiPerimeter - sides[TriangleSides.AB.ordinal()])*
+                (semiPerimeter - sides[TriangleSides.AC.ordinal()])*(semiPerimeter - sides[TriangleSides.BC.ordinal()]));
+    }
+
+    @Override
+    public void calculatePerimeter() {
+        perimeter = sides[TriangleSides.AB.ordinal()] + sides[TriangleSides.AC.ordinal()] + sides[TriangleSides.BC.ordinal()];
+    }
+
+    @Override
+    public String toString() {
+        return "Triangle{" +
+                "Ax: " + a.getX() + " Ay: " + a.getY()+
+                ", Bx: " + b.getX() + " By: " + b.getY() +
+                ", Cx: " + c.getX() + " Cy: " + c.getY() +
+                ", " + "AB: " + sides[TriangleSides.AB.ordinal()] + ", " + "BC: " +
+                sides[TriangleSides.BC.ordinal()] + ", " + "AC: " +
+                sides[TriangleSides.AC.ordinal()] + ", " +
+                triangleType.toString() + ", " + angleType.toString() +
+                ", Area: " + area + ", Perimeter: " + perimeter + "}";
+    }
 }
